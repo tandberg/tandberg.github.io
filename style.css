@@ -1,0 +1,17 @@
+body {
+    background-color: #566874;
+}
+
+#chart {
+    width: 100%;
+    text-align: center;
+    margin-top: 200px;
+}
+
+.base {
+    fill: #77C6FF;
+}
+
+.rest {
+    fill: #5F707B;
+}
