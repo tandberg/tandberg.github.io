@@ -13,48 +13,44 @@
 
 		<script>
 			(function(d3, _) {
-
-				var canvas = d3.select('#chart').append('svg')
-					.attr('height', 500)
-					.attr('width', 500);
-
-
-				var group = canvas.append('g')
-					.attr('transform', 'translate(200, 200)');
-
 				var r = 200;
-
 				var start = -2.2;
 				var end = Math.abs(start);
+				var width = 500;
+				var height = width;
+
+				var svg = d3.select('#chart').append('svg')
+					.attr('height', height)
+					.attr('width', width);
+
+
+				var group = svg.append('g')
+					.attr('transform', 'translate('+(width/2)+', '+(height/2)+')');
+
 
 				var getValue = function(percent) {
 					return start + ((end - start) * (percent / 100));
 				};
 
 
+				var arc = d3.svg.arc()
+					.innerRadius(r - 20)
+					.outerRadius(r)
+					.startAngle(start);
+
 				var doThings = function(percent) {
 
 					var value = getValue(percent);
 
-					var arc = d3.svg.arc()
-						.innerRadius(r - 20)
-						.outerRadius(r)
-						.startAngle(start)
-						.endAngle(value);
-
-					var rest = d3.svg.arc()
-						.innerRadius(r - 20)
-						.outerRadius(r)
-						.startAngle(value)
-						.endAngle(end);
-
-					group.append('path')
+					var background = group.append('path')
+						.datum({endAngle: end})
 						.attr('d', arc)
-						.attr('class', 'base');
+						.attr('class', 'background');
 
-					group.append('path')
-						.attr('d', rest)
-						.attr('class', 'rest');
+					var foreground = group.append('path')
+						.datum({endAngle: value})
+						.attr('d', arc)
+						.attr('class', 'foreground');
 
 					group.append('text')
 						.text(percent + '%')
@@ -67,6 +63,56 @@
 
 
 				doThings(_.random(0, 100));
+
+
+				var updateWheel = function(options) {
+
+					options = {
+						transition: options.transition 		 || true,
+						percent: options.percent 			 || 0,
+						transitionDuration: options.duration || 300
+					};
+
+					var value = getValue(options.percent);
+					var arcTween = function(transition, value) {
+						transition.attrTween('d', function(d) {
+							var interpolate = d3.interpolate(d.endAngle, value);
+
+							return function(t) {
+								d.endAngle = interpolate(t);
+								return arc(d);
+							}
+						})
+					};
+
+
+					if (options.transition) {
+						var paths = group.selectAll('.foreground')
+							.transition()
+							.duration(options.transitionDuration)
+							.call(arcTween, value);
+					} else {
+						group.selectAll('.foreground')
+							.datum({endAngle: value})
+							.attr('d', arc);						
+					}
+
+					group.selectAll('text')
+						.transition()
+						.duration(options.transitionDuration)
+						.tween('text', function() {
+							var i = d3.interpolate(this.textContent.split('%')[0], options.percent);
+
+							return function(t) {
+								this.textContent = Math.round(i(t)) + '%';
+							};
+						});
+
+				};
+
+				setInterval(function() {
+					updateWheel({percent: _.random(0, 100)});
+				}, 1000);
 
 			})(d3, _);
 		</script>
