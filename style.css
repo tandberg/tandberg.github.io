@@ -2,15 +2,18 @@ body {
     background-color: #566874;
 }
 
-#chart {
+.container {
+    display: flex;
+    flex-flow: row wrap;
     width: 100%;
-    text-align: center;
 }
 
-.foreground {
-    fill: #77C6FF;
+.barometer {
+    display: flex;
+    width: 50%;
+    align-items: center;
+    justify-content: center;
 }
 
-.background {
-    fill: #5F707B;
-}
+.foreground { fill: #77C6FF; }
+.background { fill: #5F707B; }

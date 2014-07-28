@@ -9,8 +9,12 @@
 		<script src="vendor/d3/d3.min.js"></script>
 	</head>
 	<body>
-		<div id="chart"></div>
-
+		<div class="container">
+			<div class="barometer" id="chart1"></div>
+			<div class="barometer" id="chart2"></div>
+			<div class="barometer" id="chart3"></div>
+			<div class="barometer" id="chart4"></div>
+		</div>
 		<script>
 			(function(d3, _) {
 				var r = 200;
@@ -18,27 +22,25 @@
 				var end = Math.abs(start);
 				var width = 500;
 				var height = width;
-
-				var svg = d3.select('#chart').append('svg')
-					.attr('height', height)
-					.attr('width', width);
-
-
-				var group = svg.append('g')
-					.attr('transform', 'translate('+(width/2)+', '+(height/2)+')');
-
-
 				var getValue = function(percent) {
 					return start + ((end - start) * (percent / 100));
 				};
-
 
 				var arc = d3.svg.arc()
 					.innerRadius(r - 20)
 					.outerRadius(r)
 					.startAngle(start);
 
-				var doThings = function(percent) {
+				var doThings = function(element, percent) {
+
+					var svg = d3.select(element).append('svg')
+						.attr('height', height)
+						.attr('width', width);
+
+
+					var group = svg.append('g')
+						.attr('transform', 'translate('+(width/2)+', '+(height/2)+')');
+
 
 					var value = getValue(percent);
 
@@ -59,13 +61,13 @@
 						.attr('fill', 'white')
 						.attr('font-family', 'Helvetica Neue');
 
+					return group;
 				};
 
 
-				doThings(_.random(0, 100));
 
 
-				var updateWheel = function(options) {
+				var updateWheel = function(group, options) {
 
 					options = {
 						transition: options.transition 		 || true,
@@ -110,8 +112,17 @@
 
 				};
 
+				var barometer1 = doThings('#chart1', _.random(0, 100));
+				var barometer2 = doThings('#chart2', _.random(0, 100));
+				var barometer3 = doThings('#chart3', _.random(0, 100));
+				var barometer4 = doThings('#chart4', _.random(0, 100));
+
+
 				setInterval(function() {
-					updateWheel({percent: _.random(0, 100)});
+					updateWheel(barometer1, {percent: _.random(0, 100)});
+					updateWheel(barometer2, {percent: _.random(0, 100)});
+					updateWheel(barometer3, {percent: _.random(0, 100)});
+					updateWheel(barometer4, {percent: _.random(0, 100)});
 				}, 1000);
 
 			})(d3, _);
